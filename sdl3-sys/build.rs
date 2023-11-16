@@ -725,7 +725,7 @@ fn generate_bindings(target: &str, host: &str, headers_paths: &[String]) {
     }
 
     let bindings = bindings
-        .header("wrapper.h")
+        .header("sdl3-sys/wrapper.h")
         .blocklist_type("FP_NAN")
         .blocklist_type("FP_INFINITE")
         .blocklist_type("FP_ZERO")

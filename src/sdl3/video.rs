@@ -1156,14 +1156,16 @@ impl WindowBuilder {
             // use SDL_CreateWindowWithPosition if x and y are not undefined
             // otherwise use SDL_CreateWindow
             let raw = if self.x != WindowPos::Undefined && self.y != WindowPos::Undefined {
-                sys::SDL_CreateWindowWithPosition(
-                    title.as_ptr() as *const c_char,
-                    to_ll_windowpos(self.x),
-                    to_ll_windowpos(self.y),
-                    raw_width,
-                    raw_height,
-                    self.window_flags,
-                )
+                let props = sys::SDL_CreateProperties();
+                sys::SDL_SetStringProperty(props, "title".as_ptr() as *const c_char, title.as_ptr() as *const c_char);
+                sys::SDL_SetNumberProperty(props, "x".as_ptr() as *const c_char, to_ll_windowpos(self.x));
+                sys::SDL_SetNumberProperty(props, "y".as_ptr() as *const c_char, to_ll_windowpos(self.y));
+                sys::SDL_SetNumberProperty(props, "width".as_ptr() as *const c_char, raw_width);
+                sys::SDL_SetNumberProperty(props, "height".as_ptr() as *const c_char, raw_height);
+                sys::SDL_SetNumberProperty(props, "flags".as_ptr() as *const c_char, self.window_flags);
+                let window = sys::SDL_CreateWindowWithProperties(props);
+                sys::SDL_DestroyProperties(props);
+                window
             } else {
                 sys::SDL_CreateWindow(
                     title.as_ptr() as *const c_char,
